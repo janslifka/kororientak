@@ -1,14 +1,14 @@
+{% extends 'base.html' %}
+
+{% block content %}
 {% if can_finish %}
-<p>
-    {{ player_nickname }}
-</p>
-<hr>
 <p>
     {{ task.text }}
 </p>
 {% else %}
-<p>
+<p class="warning">
     Nemáš vyzvednutou ani jednu kontrolu.
 </p>
 {% endif %}
+{% endblock %}
 

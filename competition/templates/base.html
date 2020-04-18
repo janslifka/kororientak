@@ -1,0 +1,86 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Kororienťák</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500&display=swap');
+
+        body {
+            font-family: 'Work Sans', sans-serif;
+            margin: 0;
+        }
+
+        header {
+            font-weight: 500;
+            font-size: 1.2rem;
+            background: #3875d7;
+            color: #fff;
+            padding: 1rem;
+        }
+
+        header .player {
+            font-size: 1rem;
+            margin-top: 0.5rem;
+            font-weight: normal;
+        }
+
+        .content {
+            padding: 1.5rem 1rem;
+        }
+
+        h1 {
+            margin: 0;
+            display: flex;
+            justify-content: space-between;
+            font-size: 1.5rem;
+        }
+
+        form {
+            border-top: 1px solid #ddd;
+            padding-top: 1rem;
+        }
+
+        form input[type=text] {
+            display: block;
+            width: 100%;
+            border: 1px solid #ddd;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            padding: 0.75rem;
+            box-sizing: border-box;
+            margin: 0.5rem 0;
+            font-family: 'Work Sans', sans-serif;
+        }
+
+        form input[type=submit] {
+            padding: 0.75rem;
+            color: #fff;
+            background: #3875d7;
+            font-size: 1rem;
+            font-family: 'Work Sans', sans-serif;
+            border: 0;
+            border-radius: 0.5rem;
+        }
+
+        .warning {
+            color: #a41515;
+        }
+    </style>
+</head>
+<body>
+<header>
+    Kororienťák
+    {% if player_nickname %}
+    <div class="player">
+        {{ player_nickname }}
+    </div>
+    {% endif %}
+</header>
+<div class="content">
+    {% block content %}
+    {% endblock %}
+</div>
+</body>
+</html>

@@ -97,7 +97,9 @@ def handle_register(request, task):
             player_uuid = uuid.uuid4()
             player_nickname = form.cleaned_data.get('nickname')
 
-            response = HttpResponse("Výborně, můžeš vyrazit")
+            response = render(request, 'registration_complete.html', {
+                'player_nickname': player_nickname
+            })
             _set_cookie(response, 'player_uuid', player_uuid)
             _set_cookie(response, 'player_nickname', player_nickname)
 
