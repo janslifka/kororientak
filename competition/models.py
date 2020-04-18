@@ -38,16 +38,3 @@ class Time(models.Model):
         verbose_name = 'Čas'
         verbose_name_plural = 'Časy'
         ordering = ('created',)
-
-
-class Answer(models.Model):
-    created = models.DateTimeField('čas', auto_now_add=True)
-    player_uuid = models.UUIDField('UUID hráče')
-    player_nickname = models.CharField('přezdívka hráče', max_length=255)
-    task = models.ForeignKey(Task, verbose_name='úkol', on_delete=models.PROTECT)
-    answer = models.TextField('odpověď')
-
-    class Meta:
-        verbose_name = 'Odpověď'
-        verbose_name_plural = 'Odpovědi'
-        ordering = ('created',)

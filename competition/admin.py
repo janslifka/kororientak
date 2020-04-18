@@ -8,7 +8,7 @@ from django.http import HttpResponse
 from django.urls import reverse
 from django.utils.safestring import mark_safe
 
-from competition.models import Task, Time, Answer
+from competition.models import Task, Time
 
 # Admin settings
 admin.site.site_header = 'Kororienťák'
@@ -61,17 +61,6 @@ class TaskAdmin(admin.ModelAdmin):
 class TimeAdmin(admin.ModelAdmin, ExportCsvMixin):
     list_display = ('created', 'player_uuid', 'player_nickname', 'task')
     readonly_fields = ('created', 'player_uuid', 'player_nickname', 'task')
-
-    actions = ('export_as_csv',)
-
-    def has_add_permission(self, request, obj=None):
-        return False
-
-
-@admin.register(Answer)
-class AnswerAdmin(admin.ModelAdmin, ExportCsvMixin):
-    list_display = ('created', 'player_uuid', 'player_nickname', 'task', 'answer')
-    readonly_fields = ('created', 'player_uuid', 'player_nickname', 'task', 'answer')
 
     actions = ('export_as_csv',)
 

@@ -4,8 +4,8 @@ import uuid
 from django.http import HttpResponse, HttpResponseNotFound
 from django.shortcuts import render
 
-from competition.models import Task, Time, Answer
-from .forms import RegistrationForm, AnswerForm
+from competition.models import Task, Time
+from .forms import RegistrationForm
 
 
 def _set_cookie(response, key, value, days_expire=7):
@@ -38,36 +38,18 @@ def view_task(request, task_uuid):
     if task.finish:
         return handle_finish(request, task, player_uuid, player_nickname)
 
+    return handle_task(request, task, player_uuid, player_nickname)
+
+
+def handle_task(request, task, player_uuid, player_nickname):
     Time.objects.get_or_create(
         player_uuid=player_uuid,
         player_nickname=player_nickname,
         task=task
     )
 
-    return handle_answer(request, task, player_uuid, player_nickname)
-
-
-def handle_answer(request, task, player_uuid, player_nickname):
-    if request.method == 'POST':
-        form = AnswerForm(request.POST)
-
-        if form.is_valid():
-            answer = form.cleaned_data.get('answer')
-            Answer.objects.create(
-                player_uuid=player_uuid,
-                player_nickname=player_nickname,
-                task=task,
-                answer=answer
-            )
-
-            return HttpResponse("Uloženo, můžeš pokračovat")
-
-    else:
-        form = AnswerForm()
-
     return render(request, 'task.html', {
         'player_nickname': player_nickname,
-        'form': form,
         'task': task
     })
 
