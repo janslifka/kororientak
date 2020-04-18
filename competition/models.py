@@ -5,13 +5,15 @@ from django.db import models
 # Create your models here.
 
 class Task(models.Model):
-    uuid = models.UUIDField(default=uuid.uuid4)
-    order = models.IntegerField()
-    text = models.TextField()
-    registration = models.BooleanField(default=False)
-    finish = models.BooleanField(default=False)
+    uuid = models.UUIDField('uuid', default=uuid.uuid4)
+    order = models.IntegerField('pořadí')
+    text = models.TextField('text')
+    registration = models.BooleanField('registrace', default=False)
+    finish = models.BooleanField('cíl', default=False)
 
     class Meta:
+        verbose_name = 'Úkol'
+        verbose_name_plural = 'Úkoly'
         ordering = ('order',)
         indexes = [
             models.Index(fields=('uuid',)),
@@ -20,17 +22,32 @@ class Task(models.Model):
             models.Index(fields=('finish',))
         ]
 
+    def __str__(self):
+        registration = ' (registrace)' if self.registration else ''
+        finish = ' (cíl)' if self.finish else ''
+        return f'Úkol {self.order}{registration}{finish}'
+
 
 class Time(models.Model):
-    created = models.DateTimeField(auto_now_add=True)
-    player_uuid = models.UUIDField()
-    player_nickname = models.CharField(max_length=255)
-    task = models.ForeignKey(Task, on_delete=models.PROTECT)
+    created = models.DateTimeField('čas', auto_now_add=True)
+    player_uuid = models.UUIDField('UUID hráče')
+    player_nickname = models.CharField('přezdívka hráče', max_length=255)
+    task = models.ForeignKey(Task, verbose_name='úkol', on_delete=models.PROTECT)
+
+    class Meta:
+        verbose_name = 'Čas'
+        verbose_name_plural = 'Časy'
+        ordering = ('created',)
 
 
 class Answer(models.Model):
-    created = models.DateTimeField(auto_now_add=True)
-    player_uuid = models.UUIDField()
-    player_nickname = models.CharField(max_length=255)
-    task = models.ForeignKey(Task, on_delete=models.PROTECT)
-    answer = models.TextField()
+    created = models.DateTimeField('čas', auto_now_add=True)
+    player_uuid = models.UUIDField('UUID hráče')
+    player_nickname = models.CharField('přezdívka hráče', max_length=255)
+    task = models.ForeignKey(Task, verbose_name='úkol', on_delete=models.PROTECT)
+    answer = models.TextField('odpověď')
+
+    class Meta:
+        verbose_name = 'Odpověď'
+        verbose_name_plural = 'Odpovědi'
+        ordering = ('created',)
