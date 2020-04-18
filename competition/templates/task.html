@@ -1,10 +1,6 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h1>
-    Stanoviště {{ task.order }}
-</h1>
-<p>
-    {{ task.text }}
-</p>
+<h1>{{ task.name }}</h1>
+<p>{{ task.text }}</p>
 {% endblock %}

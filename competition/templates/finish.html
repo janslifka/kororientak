@@ -2,13 +2,11 @@
 
 {% block content %}
 {% if can_finish %}
-<p>
-    {{ task.text }}
-</p>
+<h1>{{ task.name }}</h1>
+<p>{{ task.text }}</p>
 {% else %}
 <p class="warning">
     Nemáš vyzvednutou ani jednu kontrolu.
 </p>
 {% endif %}
 {% endblock %}
-

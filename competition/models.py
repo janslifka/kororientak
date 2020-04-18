@@ -6,7 +6,7 @@ from django.db import models
 
 class Task(models.Model):
     uuid = models.UUIDField('uuid', default=uuid.uuid4)
-    order = models.IntegerField('pořadí')
+    name = models.CharField('název', max_length=255, default='')
     text = models.TextField('text')
     registration = models.BooleanField('registrace', default=False)
     finish = models.BooleanField('cíl', default=False)
@@ -14,10 +14,9 @@ class Task(models.Model):
     class Meta:
         verbose_name = 'Úkol'
         verbose_name_plural = 'Úkoly'
-        ordering = ('order',)
+        ordering = ('name',)
         indexes = [
             models.Index(fields=('uuid',)),
-            models.Index(fields=('order',)),
             models.Index(fields=('registration',)),
             models.Index(fields=('finish',))
         ]
@@ -25,7 +24,7 @@ class Task(models.Model):
     def __str__(self):
         registration = ' (registrace)' if self.registration else ''
         finish = ' (cíl)' if self.finish else ''
-        return f'Úkol {self.order}{registration}{finish}'
+        return f'{self.name}{registration}{finish}'
 
 
 class Time(models.Model):

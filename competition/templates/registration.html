@@ -1,9 +1,8 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<p>
-    {{ task.text }}
-</p>
+<h1>{{ task.name }}</h1>
+<p>{{ task.text }}</p>
 <form action="/ukol/{{ task.uuid }}" method="post">
     {% csrf_token %}
     {{ form }}
