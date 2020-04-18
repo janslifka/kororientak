@@ -1,6 +1,11 @@
 {% extends 'base.html' %}
 
 {% block content %}
+{% if not player_nickname %}
+<p class="info">
+    Pokud se chceš zúčastnit celého běhu, více informací a mapu najdeš na <a href="{{info_url}}">{{info_url}}</a>
+</p>
+{% endif %}
 <h1>{{ task.name }}</h1>
 <p>{{ task.text }}</p>
 {% endblock %}

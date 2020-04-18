@@ -2,7 +2,6 @@ import csv
 
 from django.contrib import admin
 
-# Register your models here.
 from django.conf import settings
 from django.http import HttpResponse
 from django.urls import reverse

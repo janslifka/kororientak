@@ -1,10 +1,11 @@
 import datetime
 import uuid
 
-from django.http import HttpResponse, HttpResponseNotFound
+from django.conf import settings
+from django.http import HttpResponseNotFound
 from django.shortcuts import render
 
-from competition.models import Task, Time
+from .models import Task, Time
 from .forms import RegistrationForm
 
 
@@ -32,9 +33,6 @@ def view_task(request, task_uuid):
 
     player_uuid, player_nickname = _get_player(request)
 
-    if player_uuid is None or player_nickname is None:
-        return render(request, 'not_registered.html')
-
     if task.finish:
         return handle_finish(request, task, player_uuid, player_nickname)
 
@@ -42,15 +40,17 @@ def view_task(request, task_uuid):
 
 
 def handle_task(request, task, player_uuid, player_nickname):
-    Time.objects.get_or_create(
-        player_uuid=player_uuid,
-        player_nickname=player_nickname,
-        task=task
-    )
+    if player_uuid is not None and player_nickname is not None:
+        Time.objects.get_or_create(
+            player_uuid=player_uuid,
+            player_nickname=player_nickname,
+            task=task
+        )
 
     return render(request, 'task.html', {
         'player_nickname': player_nickname,
-        'task': task
+        'task': task,
+        'info_url': settings.INFO_URL
     })
 
 
