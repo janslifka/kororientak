@@ -3,7 +3,10 @@ import csv
 from django.contrib import admin
 
 # Register your models here.
+from django.conf import settings
 from django.http import HttpResponse
+from django.urls import reverse
+from django.utils.safestring import mark_safe
 
 from competition.models import Task, Time, Answer
 
@@ -34,8 +37,13 @@ class ExportCsvMixin:
 class TaskAdmin(admin.ModelAdmin):
     list_display = ('order', 'uuid', 'text', 'registration', 'finish')
 
-    fields = ('order', 'text', 'registration', 'finish')
-    readonly_fields = ('uuid',)
+    fields = ('order', 'text', 'registration', 'finish', 'qr_code')
+    readonly_fields = ('uuid', 'qr_code')
+
+    def qr_code(self, obj):
+        link = settings.PUBLIC_URL + reverse('task', args=[obj.uuid])
+        src = f'https://api.qrserver.com/v1/create-qr-code/?size=500x500&data={link}'
+        return mark_safe(f'<img src={src}>')
 
 
 @admin.register(Time)
