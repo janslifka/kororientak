@@ -37,8 +37,13 @@ class ExportCsvMixin:
 class TaskAdmin(admin.ModelAdmin):
     list_display = ('order', 'uuid', 'text', 'registration', 'finish')
 
-    fields = ('order', 'text', 'registration', 'finish', 'qr_code')
     readonly_fields = ('uuid', 'qr_code')
+
+    def get_fields(self, request, obj=None):
+        if obj:
+            return 'order', 'text', 'registration', 'finish', 'qr_code'
+        else:
+            return 'order', 'text', 'registration', 'finish'
 
     def qr_code(self, obj):
         link = settings.PUBLIC_URL + reverse('task', args=[obj.uuid])

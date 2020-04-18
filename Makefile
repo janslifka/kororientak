@@ -1,5 +1,5 @@
 MANAGE=python manage.py
-IMAGE=
+IMAGE=registry.lonelyvertex.com/kororientak
 
 .PHONY: run
 run:
