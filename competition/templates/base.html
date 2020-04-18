@@ -21,8 +21,16 @@
 
         header .player {
             font-size: 1rem;
-            margin-top: 0.5rem;
+            margin-top: 0.75rem;
             font-weight: normal;
+        }
+
+        header .player .player-category {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.5rem;
+            font-size: 0.8rem;
+            margin-left: 0.5rem;
         }
 
         .content {
@@ -38,7 +46,6 @@
 
         form {
             border-top: 1px solid #ddd;
-            padding-top: 1rem;
         }
 
         form input[type=text] {
@@ -61,6 +68,40 @@
             font-family: 'Work Sans', sans-serif;
             border: 0;
             border-radius: 0.5rem;
+            width: 100%;
+            text-align: center;
+            margin-top: 2rem;
+        }
+
+        form label {
+            display: block;
+            padding-top: 1rem;
+            font-weight: 500;
+        }
+
+        form ul {
+            margin: 0;
+            padding: 0;
+        }
+
+        form ul li {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        form ul li label {
+            background: #eee;
+            border: 1px solid #eee;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-top: 0.5rem;
+            font-weight: normal;
+        }
+
+        form ul li label.selected {
+            color: #3875d7;
+            border: 1px solid #3875d7;
         }
 
         .warning {
@@ -84,7 +125,7 @@
     Kororienťák
     {% if player_nickname %}
     <div class="player">
-        {{ player_nickname }}
+        {{ player_nickname }} <span class="player-category">{{ player_category }}</span>
     </div>
     {% endif %}
 </header>

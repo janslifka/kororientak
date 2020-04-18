@@ -19,7 +19,19 @@ def _set_cookie(response, key, value, days_expire=7):
 def _get_player(request):
     player_uuid = request.COOKIES.get('player_uuid')
     player_nickname = request.COOKIES.get('player_nickname')
-    return player_uuid, player_nickname
+    player_category = request.COOKIES.get('player_category')
+    return player_uuid, player_nickname, player_category
+
+
+def _valid_player(player):
+    return all([prop is not None for prop in player])
+
+
+def _set_player_for_template(player, options):
+    if _valid_player(player):
+        options['player_nickname'] = player[1]
+        options['player_category'] = 'Výletník' if player[2] == 'V' else 'Běžec'
+    return options
 
 
 def view_task(request, task_uuid):
@@ -31,44 +43,48 @@ def view_task(request, task_uuid):
     if task.registration:
         return handle_register(request, task)
 
-    player_uuid, player_nickname = _get_player(request)
+    player = _get_player(request)
 
     if task.finish:
-        return handle_finish(request, task, player_uuid, player_nickname)
+        return handle_finish(request, task, player)
 
-    return handle_task(request, task, player_uuid, player_nickname)
+    return handle_task(request, task, player)
 
 
-def handle_task(request, task, player_uuid, player_nickname):
-    if player_uuid is not None and player_nickname is not None:
+def handle_task(request, task, player):
+    player_uuid, player_nickname, player_category = player
+
+    if _valid_player(player):
         Time.objects.get_or_create(
             player_uuid=player_uuid,
             player_nickname=player_nickname,
+            player_category=player_category,
             task=task
         )
 
-    return render(request, 'task.html', {
-        'player_nickname': player_nickname,
+    return render(request, 'task.html', _set_player_for_template(player, {
         'task': task,
         'info_url': settings.INFO_URL
-    })
+    }))
 
 
-def handle_finish(request, task, player_uuid, player_nickname):
+def handle_finish(request, task, player):
+    player_uuid, player_nickname, player_category = player
     times = Time.objects.filter(player_uuid=player_uuid, task__registration=False, task__finish=False).count()
+    can_finish = _valid_player(player) and times > 0
 
-    if times > 0:
+    if can_finish:
         Time.objects.get_or_create(
             player_uuid=player_uuid,
             player_nickname=player_nickname,
+            player_category=player_category,
             task=task
         )
 
-    return render(request, 'finish.html', {
-        'can_finish': times > 0,
-        'player_nickname': player_nickname,
+    return render(request, 'finish.html', _set_player_for_template(player, {
+        'can_finish': can_finish,
         'task': task
-    })
+    }))
 
 
 def handle_register(request, task):
@@ -78,16 +94,18 @@ def handle_register(request, task):
         if form.is_valid():
             player_uuid = uuid.uuid4()
             player_nickname = form.cleaned_data.get('nickname')
+            player_category = form.cleaned_data.get('category')
 
-            response = render(request, 'registration_complete.html', {
-                'player_nickname': player_nickname
-            })
+            response = render(request, 'registration_complete.html',
+                              _set_player_for_template((player_uuid, player_nickname, player_category), {}))
             _set_cookie(response, 'player_uuid', player_uuid)
             _set_cookie(response, 'player_nickname', player_nickname)
+            _set_cookie(response, 'player_category', player_category)
 
             Time.objects.create(
                 player_uuid=player_uuid,
                 player_nickname=player_nickname,
+                player_category=player_category,
                 task=task
             )
 

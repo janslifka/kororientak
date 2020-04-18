@@ -30,10 +30,16 @@ class Task(models.Model):
 class Time(models.Model):
     created = models.DateTimeField('čas', auto_now_add=True)
     player_uuid = models.UUIDField('UUID hráče')
-    player_nickname = models.CharField('přezdívka hráče', max_length=255)
+    player_nickname = models.CharField('přezdívka', max_length=255)
+    player_category = models.CharField('kategorie', max_length=1)
     task = models.ForeignKey(Task, verbose_name='úkol', on_delete=models.PROTECT)
 
     class Meta:
         verbose_name = 'Čas'
         verbose_name_plural = 'Časy'
         ordering = ('created',)
+
+    def category(self):
+        return 'Výletník' if self.category == 'V' else 'Běžec'
+
+    category.short_description = 'kategorie'
