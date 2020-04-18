@@ -21,10 +21,6 @@ def _get_player(request):
     return player_uuid, player_nickname
 
 
-def index(request):
-    return HttpResponse("hello, world")
-
-
 def view_task(request, task_uuid):
     task = Task.objects.filter(uuid=task_uuid).first()
 
@@ -39,17 +35,14 @@ def view_task(request, task_uuid):
     if player_uuid is None or player_nickname is None:
         return render(request, 'not_registered.html')
 
+    if task.finish:
+        return handle_finish(request, task, player_uuid, player_nickname)
+
     Time.objects.get_or_create(
         player_uuid=player_uuid,
         player_nickname=player_nickname,
         task=task
     )
-
-    if task.finish:
-        return render(request, 'finish.html', {
-            'player_nickname': player_nickname,
-            'task': task
-        })
 
     return handle_answer(request, task, player_uuid, player_nickname)
 
@@ -75,6 +68,23 @@ def handle_answer(request, task, player_uuid, player_nickname):
     return render(request, 'task.html', {
         'player_nickname': player_nickname,
         'form': form,
+        'task': task
+    })
+
+
+def handle_finish(request, task, player_uuid, player_nickname):
+    times = Time.objects.filter(player_uuid=player_uuid, task__registration=False, task__finish=False).count()
+
+    if times > 0:
+        Time.objects.get_or_create(
+            player_uuid=player_uuid,
+            player_nickname=player_nickname,
+            task=task
+        )
+
+    return render(request, 'finish.html', {
+        'can_finish': times > 0,
+        'player_nickname': player_nickname,
         'task': task
     })
 

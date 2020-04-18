@@ -1,3 +1,4 @@
+{% if can_finish %}
 <p>
     {{ player_nickname }}
 </p>
@@ -5,3 +6,9 @@
 <p>
     {{ task.text }}
 </p>
+{% else %}
+<p>
+    Nemáš vyzvednutou ani jednu kontrolu.
+</p>
+{% endif %}
+

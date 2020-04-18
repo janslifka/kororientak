@@ -37,18 +37,24 @@ class ExportCsvMixin:
 class TaskAdmin(admin.ModelAdmin):
     list_display = ('order', 'uuid', 'text', 'registration', 'finish')
 
-    readonly_fields = ('uuid', 'qr_code')
+    readonly_fields = ('uuid', 'qr_code', 'link')
 
     def get_fields(self, request, obj=None):
         if obj:
-            return 'order', 'text', 'registration', 'finish', 'qr_code'
+            return 'order', 'text', 'registration', 'finish', 'qr_code', 'link'
         else:
             return 'order', 'text', 'registration', 'finish'
 
     def qr_code(self, obj):
-        link = settings.PUBLIC_URL + reverse('task', args=[obj.uuid])
-        src = f'https://api.qrserver.com/v1/create-qr-code/?size=500x500&data={link}'
+        src = f'https://api.qrserver.com/v1/create-qr-code/?size=500x500&data={self._url(obj)}'
         return mark_safe(f'<img src={src}>')
+
+    def link(self, obj):
+        href = self._url(obj)
+        return mark_safe(f'<a href={href}>{href}</a>')
+
+    def _url(self, obj):
+        return settings.PUBLIC_URL + reverse('task', args=[obj.uuid])
 
 
 @admin.register(Time)
