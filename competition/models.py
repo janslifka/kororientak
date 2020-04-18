@@ -40,6 +40,6 @@ class Time(models.Model):
         ordering = ('created',)
 
     def category(self):
-        return 'Výletník' if self.category == 'V' else 'Běžec'
+        return 'Výletník' if self.player_category == 'V' else 'Běžec'
 
     category.short_description = 'kategorie'
