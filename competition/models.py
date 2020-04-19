@@ -1,3 +1,4 @@
+import re
 import uuid as uuid
 from django.db import models
 
@@ -7,7 +8,8 @@ from django.db import models
 class Task(models.Model):
     uuid = models.UUIDField('uuid', default=uuid.uuid4)
     name = models.CharField('název', max_length=255, default='')
-    text = models.TextField('text')
+    text = models.TextField('text', null=True, blank=True)
+    youtube_link = models.CharField('YouTube video', max_length=255, null=True, blank=True)
     registration = models.BooleanField('registrace', default=False)
     finish = models.BooleanField('cíl', default=False)
 
@@ -25,6 +27,15 @@ class Task(models.Model):
         registration = ' (registrace)' if self.registration else ''
         finish = ' (cíl)' if self.finish else ''
         return f'{self.name}{registration}{finish}'
+
+    def youtube_id(self):
+        if self.youtube_link is None:
+            return None
+
+        m = re.search('(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})', self.youtube_link)
+        if m is None:
+            return None
+        return m.group(1)
 
 
 class Time(models.Model):

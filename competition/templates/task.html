@@ -7,5 +7,15 @@
 </p>
 {% endif %}
 <h1>{{ task.name }}</h1>
+
+{% if task.text %}
 <p>{{ task.text }}</p>
+{% endif %}
+
+{% if task.youtube_id %}
+<div class="embed-container">
+    <iframe src="https://www.youtube.com/embed/{{ task.youtube_id }}" frameborder="0" allowfullscreen></iframe>
+</div>
+{% endif %}
+
 {% endblock %}
