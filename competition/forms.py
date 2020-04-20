@@ -1,7 +1,7 @@
 from django import forms
 
 CATEGORIES = [('V', 'Výletník'),
-              ('B', 'Běžec')]
+              ('B', 'Borec')]
 
 
 class RegistrationForm(forms.Form):

@@ -3,7 +3,6 @@ import uuid as uuid
 from django.db import models
 
 
-# Create your models here.
 
 class Task(models.Model):
     uuid = models.UUIDField('uuid', default=uuid.uuid4)
@@ -51,6 +50,6 @@ class Time(models.Model):
         ordering = ('created',)
 
     def category(self):
-        return 'Výletník' if self.player_category == 'V' else 'Běžec'
+        return 'Výletník' if self.player_category == 'V' else 'Borec'
 
     category.short_description = 'kategorie'

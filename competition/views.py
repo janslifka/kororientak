@@ -30,7 +30,7 @@ def _valid_player(player):
 def _set_player_for_template(player, options):
     if _valid_player(player):
         options['player_nickname'] = player[1]
-        options['player_category'] = 'Výletník' if player[2] == 'V' else 'Běžec'
+        options['player_category'] = 'Výletník' if player[2] == 'V' else 'Borec'
     return options
 
 
