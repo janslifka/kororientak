@@ -15,7 +15,7 @@ class Task(models.Model):
     class Meta:
         verbose_name = 'Úkol'
         verbose_name_plural = 'Úkoly'
-        ordering = ('name',)
+        ordering = ('-registration', '-finish', 'name',)
         indexes = [
             models.Index(fields=('uuid',)),
             models.Index(fields=('registration',)),
