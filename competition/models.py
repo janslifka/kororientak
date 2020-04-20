@@ -1,7 +1,9 @@
 import re
 import uuid as uuid
-from django.db import models
 
+from django.conf import settings
+from django.db import models
+from django.urls import reverse
 
 
 class Task(models.Model):
@@ -31,10 +33,15 @@ class Task(models.Model):
         if self.youtube_link is None:
             return None
 
-        m = re.search('(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})', self.youtube_link)
+        m = re.search('(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})',
+                      self.youtube_link)
         if m is None:
             return None
         return m.group(1)
+
+    def qr_code(self):
+        url = settings.PUBLIC_URL + reverse('task', args=[self.uuid])
+        return f'https://api.qrserver.com/v1/create-qr-code/?size=500x500&data={url}'
 
 
 class Time(models.Model):

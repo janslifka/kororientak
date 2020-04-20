@@ -2,8 +2,10 @@ import datetime
 import uuid
 
 from django.conf import settings
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseNotFound
 from django.shortcuts import render
+from django.views import View
 
 from .models import Task, Time
 from .forms import RegistrationForm
@@ -118,3 +120,12 @@ def handle_register(request, task):
         'form': form,
         'task': task
     })
+
+
+class QRCodesView(LoginRequiredMixin, View):
+    def get(self, request):
+        tasks = Task.objects.all()
+
+        return render(request, 'qr-codes.html', {
+            'tasks': tasks
+        })
