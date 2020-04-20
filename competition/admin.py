@@ -10,8 +10,8 @@ from django.utils.safestring import mark_safe
 from competition.models import Task, Time
 
 # Admin settings
-admin.site.site_header = 'Kororienťák'
-admin.site.site_title = 'Kororienťák'
+admin.site.site_header = 'KorOrienťák'
+admin.site.site_title = 'KorOrienťák'
 
 
 class ExportCsvMixin:
