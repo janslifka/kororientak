@@ -1,5 +1,6 @@
 import datetime
 import uuid
+from base64 import b64encode, b64decode
 
 from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -19,10 +20,13 @@ def _set_cookie(response, key, value, days_expire=7):
 
 
 def _get_player(request):
-    player_uuid = request.COOKIES.get('player_uuid')
-    player_nickname = request.COOKIES.get('player_nickname')
-    player_category = request.COOKIES.get('player_category')
-    return player_uuid, player_nickname, player_category
+    try:
+        player_uuid = request.COOKIES.get('player_uuid')
+        player_nickname = b64decode(request.COOKIES.get('player_nickname'))
+        player_category = request.COOKIES.get('player_category')
+        return player_uuid, player_nickname, player_category
+    except Exception:
+        return None, None, None
 
 
 def _valid_player(player):
@@ -101,7 +105,7 @@ def handle_register(request, task):
             response = render(request, 'registration_complete.html',
                               _set_player_for_template((player_uuid, player_nickname, player_category), {}))
             _set_cookie(response, 'player_uuid', player_uuid)
-            _set_cookie(response, 'player_nickname', player_nickname)
+            _set_cookie(response, 'player_nickname', b64encode(player_nickname.encode()))
             _set_cookie(response, 'player_category', player_category)
 
             Time.objects.create(
