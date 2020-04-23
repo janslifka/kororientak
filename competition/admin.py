@@ -58,8 +58,8 @@ class TaskAdmin(admin.ModelAdmin):
 
 @admin.register(Time)
 class TimeAdmin(admin.ModelAdmin, ExportCsvMixin):
-    list_display = ('created', 'player_nickname', 'category', 'task')
-    fields = ('created', 'player_nickname', 'category', 'task')
+    list_display = ('created', 'player_nickname', 'player_uuid', 'category', 'task')
+    fields = ('created', 'player_nickname', 'player_uuid', 'category', 'task')
     readonly_fields = ('created', 'player_nickname', 'category', 'task')
 
     actions = ('export_as_csv',)

@@ -3,4 +3,5 @@ gunicorn==19.9.0
 psycopg2-binary==2.8.2
 python-dotenv==0.13.0
 smart-getenv==1.1.0
+Unidecode==1.1.1
 whitenoise==5.0.1

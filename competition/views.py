@@ -1,7 +1,7 @@
 import datetime
 import uuid
-from base64 import b64encode, b64decode
 
+import unidecode as unidecode
 from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseNotFound
@@ -22,7 +22,7 @@ def _set_cookie(response, key, value, days_expire=7):
 def _get_player(request):
     try:
         player_uuid = request.COOKIES.get('player_uuid')
-        player_nickname = b64decode(request.COOKIES.get('player_nickname'))
+        player_nickname = request.COOKIES.get('player_nickname')
         player_category = request.COOKIES.get('player_category')
         return player_uuid, player_nickname, player_category
     except Exception:
@@ -99,13 +99,13 @@ def handle_register(request, task):
 
         if form.is_valid():
             player_uuid = uuid.uuid4()
-            player_nickname = form.cleaned_data.get('nickname')
+            player_nickname = unidecode.unidecode(form.cleaned_data.get('nickname'))
             player_category = form.cleaned_data.get('category')
 
             response = render(request, 'registration_complete.html',
                               _set_player_for_template((player_uuid, player_nickname, player_category), {}))
             _set_cookie(response, 'player_uuid', player_uuid)
-            _set_cookie(response, 'player_nickname', b64encode(player_nickname.encode()))
+            _set_cookie(response, 'player_nickname', player_nickname)
             _set_cookie(response, 'player_category', player_category)
 
             Time.objects.create(
