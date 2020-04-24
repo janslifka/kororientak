@@ -6,8 +6,8 @@ RUN mkdir /kororientak
 WORKDIR /kororientak
 
 COPY docker/start.sh /kororientak/
-COPY requirements.txt /kororientak/
-RUN pip install -r requirements.txt
+COPY requirements /kororientak/requirements
+RUN pip install -r requirements/prod.txt
 
 COPY kororientak /kororientak/kororientak
 
