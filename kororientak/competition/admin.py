@@ -7,7 +7,7 @@ from django.http import HttpResponse
 from django.urls import reverse
 from django.utils.safestring import mark_safe
 
-from competition.models import Task, Time
+from .models import Task, Time
 
 # Admin settings
 admin.site.site_header = 'KorOrienťák'

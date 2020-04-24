@@ -1,4 +1,4 @@
-MANAGE=python manage.py
+MANAGE=python kororientak/manage.py
 IMAGE=registry.lonelyvertex.com/kororientak
 
 .PHONY: run
@@ -35,7 +35,7 @@ recreate_db:
 
 .PHONY: docker.build
 docker.build:
-	docker build -t $(IMAGE) .
+	docker build -t $(IMAGE) -f docker/Dockerfile .
 
 
 .PHONY: docker.push
