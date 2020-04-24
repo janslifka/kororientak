@@ -11,6 +11,11 @@ test:
 	$(MANAGE) test
 
 
+.PHONY: codestyle
+codestyle:
+	pycodestyle kororientak
+
+
 .PHONY: makemigrations
 makemigrations:
 	$(MANAGE) makemigrations
