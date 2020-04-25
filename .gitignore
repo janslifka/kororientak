@@ -123,4 +123,4 @@ dmypy.json
 .pyre/
 
 # Static files
-kororientak_/static
+kororientak/static

@@ -11,6 +11,12 @@ test:
 	$(MANAGE) test competition.tests
 
 
+.PHONY: coverage
+coverage:
+	coverage run --source="kororientak/competition" kororientak/manage.py test competition.tests
+	coverage html
+
+
 .PHONY: codestyle
 codestyle:
 	pycodestyle kororientak
