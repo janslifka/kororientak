@@ -11,6 +11,8 @@ from .models import Task, Time, Category, Player
 
 
 class TaskView(View):
+    PLAYER_UUID_COOKIE = 'player_uuid'
+
     def get(self, request, task_uuid):
         self._initialize(request, task_uuid)
 
@@ -43,7 +45,7 @@ class TaskView(View):
 
     def _get_player(self):
         try:
-            player_uuid = self.request.COOKIES.get('player_uuid')
+            player_uuid = self.request.COOKIES.get(self.PLAYER_UUID_COOKIE)
             return Player.objects.get(uuid=player_uuid) if player_uuid else None
         except Exception:
             return None
@@ -61,7 +63,7 @@ class TaskView(View):
                 self._create_time()
 
                 response = self._render('registration_complete.html', {})
-                self._set_cookie(response, 'player_uuid', self.player.uuid)
+                self._set_cookie(response, self.PLAYER_UUID_COOKIE, self.player.uuid)
 
                 return response
 
@@ -69,28 +71,24 @@ class TaskView(View):
             self.player = None
             form = RegistrationForm(choices)
 
-        return self._render('registration.html', {
-            'form': form,
-        })
+        return self._render('registration.html', {'form': form, })
 
     def _handle_finish(self):
         times = Time.objects.filter(player=self.player, task__registration=False, task__finish=False).count()
         can_finish = self.player is not None and times > 0
+        response = self._render('finish.html', {'can_finish': can_finish})
 
         if can_finish:
             self._create_time()
+            response.delete_cookie(self.PLAYER_UUID_COOKIE)
 
-        return self._render('finish.html', {
-            'can_finish': can_finish
-        })
+        return response
 
     def _handle_task(self):
         if self.player:
             self._create_time()
 
-        return self._render('task.html', {
-            'info_url': settings.INFO_URL,
-        })
+        return self._render('task.html', {'info_url': settings.INFO_URL})
 
     def _create_time(self):
         Time.objects.get_or_create(player=self.player, task=self.task)
