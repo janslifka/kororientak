@@ -1,109 +1,110 @@
 import datetime
-import uuid
 
-import unidecode as unidecode
 from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import HttpResponseNotFound
+from django.http import HttpResponseNotFound, HttpResponseNotAllowed
 from django.shortcuts import render
 from django.views import View
 
-from .models import Task, Time, Category, Player
 from .forms import RegistrationForm
+from .models import Task, Time, Category, Player
 
 
-def _set_cookie(response, key, value, days_expire=7):
-    max_age = days_expire * 24 * 60 * 60
-    expires = datetime.datetime.strftime(datetime.datetime.utcnow() + datetime.timedelta(seconds=max_age),
-                                         "%a, %d-%b-%Y %H:%M:%S GMT")
-    response.set_cookie(key, value, max_age=max_age, expires=expires)
+class TaskView(View):
+    def get(self, request, task_uuid):
+        self._initialize(request, task_uuid)
 
+        if self.task is None:
+            return HttpResponseNotFound()
 
-def _get_player(request):
-    try:
-        player_uuid = request.COOKIES.get('player_uuid')
-        player = Player.objects.get(uuid=player_uuid)
-        return player
-    except Exception:
-        return None
+        if self.task.registration:
+            return self._handle_register()
 
+        if self.task.finish:
+            return self._handle_finish()
 
-def view_task(request, task_uuid):
-    task = Task.objects.filter(uuid=task_uuid).first()
+        return self._handle_task()
 
-    if task is None:
-        return HttpResponseNotFound()
+    def post(self, request, task_uuid):
+        self._initialize(request, task_uuid)
 
-    if task.registration:
-        return handle_register(request, task)
+        if self.task is None:
+            return HttpResponseNotFound()
 
-    player = _get_player(request)
+        if self.task.registration:
+            return self._handle_register()
 
-    if task.finish:
-        return handle_finish(request, task, player)
+        return HttpResponseNotAllowed(['GET'])
 
-    return handle_task(request, task, player)
+    def _initialize(self, request, task_uuid):
+        self.request = request
+        self.task = Task.objects.get(uuid=task_uuid)
+        self.player = self._get_player()
 
+    def _get_player(self):
+        try:
+            player_uuid = self.request.COOKIES.get('player_uuid')
+            return Player.objects.get(uuid=player_uuid) if player_uuid else None
+        except Exception:
+            return None
 
-def handle_task(request, task, player):
-    player = _get_player(request)
+    def _handle_register(self):
+        choices = Category.objects.form_choices(self.task.race)
+        if self.request.method == 'POST':
+            form = RegistrationForm(choices, self.request.POST)
 
-    if player:
-        Time.objects.get_or_create(
-            player=player,
-            task=task
-        )
+            if form.is_valid():
+                player_name = form.cleaned_data.get('name')
+                category = Category.objects.get(pk=form.cleaned_data.get('category'))
 
-    return render(request, 'task.html', {
-        'task': task,
-        'info_url': settings.INFO_URL,
-        'player': player
-    })
+                self.player = Player.objects.create(name=player_name, category=category, race=self.task.race)
+                self._create_time()
 
+                response = self._render('registration_complete.html', {})
+                self._set_cookie(response, 'player_uuid', self.player.uuid)
 
-def handle_finish(request, task, player):
-    times = Time.objects.filter(player=player, task__registration=False, task__finish=False).count()
-    can_finish = player is not None and times > 0
+                return response
 
-    if can_finish:
-        Time.objects.get_or_create(
-            player=player,
-            task=task
-        )
+        else:
+            self.player = None
+            form = RegistrationForm(choices)
 
-    return render(request, 'finish.html', {
-        'can_finish': can_finish,
-        'player': player,
-        'task': task
-    })
+        return self._render('registration.html', {
+            'form': form,
+        })
 
+    def _handle_finish(self):
+        times = Time.objects.filter(player=self.player, task__registration=False, task__finish=False).count()
+        can_finish = self.player is not None and times > 0
 
-def handle_register(request, task):
-    choices = Category.objects.form_choices(task.race)
-    if request.method == 'POST':
-        form = RegistrationForm(choices, request.POST)
+        if can_finish:
+            self._create_time()
 
-        if form.is_valid():
-            player_name = form.cleaned_data.get('name')
-            category = Category.objects.get(pk=form.cleaned_data.get('category'))
+        return self._render('finish.html', {
+            'can_finish': can_finish
+        })
 
-            player = Player.objects.create(name=player_name, category=category, race=task.race)
-            Time.objects.create(player=player, task=task)
+    def _handle_task(self):
+        if self.player:
+            self._create_time()
 
-            response = render(request, 'registration_complete.html', {
-                'player': player
-            })
-            _set_cookie(response, 'player_uuid', player.uuid)
+        return self._render('task.html', {
+            'info_url': settings.INFO_URL,
+        })
 
-            return response
+    def _create_time(self):
+        Time.objects.get_or_create(player=self.player, task=self.task)
 
-    else:
-        form = RegistrationForm(choices)
+    def _render(self, template, template_data):
+        template_data['player'] = self.player
+        template_data['task'] = self.task
+        return render(self.request, template, template_data)
 
-    return render(request, 'registration.html', {
-        'form': form,
-        'task': task
-    })
+    def _set_cookie(self, response, key, value, days_expire=7):
+        max_age = days_expire * 24 * 60 * 60
+        expires = datetime.datetime.strftime(datetime.datetime.utcnow() + datetime.timedelta(seconds=max_age),
+                                             "%a, %d-%b-%Y %H:%M:%S GMT")
+        response.set_cookie(key, value, max_age=max_age, expires=expires)
 
 
 class QRCodesView(LoginRequiredMixin, View):
