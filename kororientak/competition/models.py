@@ -6,6 +6,56 @@ from django.db import models
 from django.urls import reverse
 
 
+class Race(models.Model):
+    name = models.CharField('název', max_length=255)
+    start = models.DateTimeField('začátek')
+    end = models.DateTimeField('konec')
+
+    class Meta:
+        verbose_name = 'Závod'
+        verbose_name_plural = 'Závody'
+        ordering = ('-start',)
+
+    def __str__(self):
+        return self.name
+
+
+class CategoryManager(models.Manager):
+    def form_choices(self, race):
+        categories = super().get_queryset().filter(race=race)
+        return [(c.pk, c.name) for c in categories]
+
+
+class Category(models.Model):
+    objects = CategoryManager()
+
+    name = models.CharField('název', max_length=255)
+    race = models.ForeignKey(Race, verbose_name='závod', on_delete=models.CASCADE)
+
+    class Meta:
+        verbose_name = 'Kategorie'
+        verbose_name_plural = 'Kategorie'
+        ordering = ('name',)
+
+    def __str__(self):
+        return self.name
+
+
+class Player(models.Model):
+    uuid = models.UUIDField('uuid', default=uuid.uuid4)
+    name = models.CharField('jméno', max_length=255)
+    race = models.ForeignKey(Race, verbose_name='závod', on_delete=models.PROTECT)
+    category = models.ForeignKey(Category, verbose_name='kategorie', on_delete=models.PROTECT)
+
+    class Meta:
+        verbose_name = 'Závodník'
+        verbose_name_plural = 'Závodníci'
+        ordering = ('name',)
+
+    def __str__(self):
+        return self.name
+
+
 class Task(models.Model):
     uuid = models.UUIDField('uuid', default=uuid.uuid4)
     name = models.CharField('název', max_length=255, default='')
@@ -13,6 +63,7 @@ class Task(models.Model):
     youtube_link = models.CharField('YouTube video', max_length=255, null=True, blank=True)
     registration = models.BooleanField('registrace', default=False)
     finish = models.BooleanField('cíl', default=False)
+    race = models.ForeignKey(Race, verbose_name='závod', on_delete=models.PROTECT)
 
     class Meta:
         verbose_name = 'Úkol'
@@ -46,17 +97,10 @@ class Task(models.Model):
 
 class Time(models.Model):
     created = models.DateTimeField('čas', auto_now_add=True)
-    player_uuid = models.UUIDField('UUID hráče')
-    player_nickname = models.CharField('přezdívka', max_length=255)
-    player_category = models.CharField('kategorie', max_length=1)
+    player = models.ForeignKey(Player, verbose_name='závodník', on_delete=models.PROTECT)
     task = models.ForeignKey(Task, verbose_name='úkol', on_delete=models.PROTECT)
 
     class Meta:
         verbose_name = 'Čas'
         verbose_name_plural = 'Časy'
         ordering = ('created',)
-
-    def category(self):
-        return 'Výletník' if self.player_category == 'V' else 'Borec'
-
-    category.short_description = 'kategorie'

@@ -8,7 +8,7 @@ run:
 
 .PHONY: test
 test:
-	$(MANAGE) test
+	$(MANAGE) test competition.tests
 
 
 .PHONY: codestyle

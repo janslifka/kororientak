@@ -1,9 +1,10 @@
 from django import forms
 
-CATEGORIES = [('V', 'Výletník'),
-              ('B', 'Borec')]
-
 
 class RegistrationForm(forms.Form):
-    nickname = forms.CharField(label='Tvoje přezdívka', max_length=255)
-    category = forms.ChoiceField(label='Kategorie', choices=CATEGORIES, widget=forms.RadioSelect)
+    name = forms.CharField(label='Tvoje jméno', max_length=255)
+    category = forms.ChoiceField(label='Kategorie', choices=(), widget=forms.RadioSelect)
+
+    def __init__(self, choices, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['category'].choices = choices

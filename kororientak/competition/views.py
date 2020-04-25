@@ -8,7 +8,7 @@ from django.http import HttpResponseNotFound
 from django.shortcuts import render
 from django.views import View
 
-from .models import Task, Time
+from .models import Task, Time, Category, Player
 from .forms import RegistrationForm
 
 
@@ -22,22 +22,10 @@ def _set_cookie(response, key, value, days_expire=7):
 def _get_player(request):
     try:
         player_uuid = request.COOKIES.get('player_uuid')
-        player_nickname = request.COOKIES.get('player_nickname')
-        player_category = request.COOKIES.get('player_category')
-        return player_uuid, player_nickname, player_category
+        player = Player.objects.get(uuid=player_uuid)
+        return player
     except Exception:
-        return None, None, None
-
-
-def _valid_player(player):
-    return all([prop is not None for prop in player])
-
-
-def _set_player_for_template(player, options):
-    if _valid_player(player):
-        options['player_nickname'] = player[1]
-        options['player_category'] = 'Výletník' if player[2] == 'V' else 'Borec'
-    return options
+        return None
 
 
 def view_task(request, task_uuid):
@@ -58,67 +46,59 @@ def view_task(request, task_uuid):
 
 
 def handle_task(request, task, player):
-    player_uuid, player_nickname, player_category = player
+    player = _get_player(request)
 
-    if _valid_player(player):
+    if player:
         Time.objects.get_or_create(
-            player_uuid=player_uuid,
-            player_nickname=player_nickname,
-            player_category=player_category,
+            player=player,
             task=task
         )
 
-    return render(request, 'task.html', _set_player_for_template(player, {
+    return render(request, 'task.html', {
         'task': task,
-        'info_url': settings.INFO_URL
-    }))
+        'info_url': settings.INFO_URL,
+        'player': player
+    })
 
 
 def handle_finish(request, task, player):
-    player_uuid, player_nickname, player_category = player
-    times = Time.objects.filter(player_uuid=player_uuid, task__registration=False, task__finish=False).count()
-    can_finish = _valid_player(player) and times > 0
+    times = Time.objects.filter(player=player, task__registration=False, task__finish=False).count()
+    can_finish = player is not None and times > 0
 
     if can_finish:
         Time.objects.get_or_create(
-            player_uuid=player_uuid,
-            player_nickname=player_nickname,
-            player_category=player_category,
+            player=player,
             task=task
         )
 
-    return render(request, 'finish.html', _set_player_for_template(player, {
+    return render(request, 'finish.html', {
         'can_finish': can_finish,
+        'player': player,
         'task': task
-    }))
+    })
 
 
 def handle_register(request, task):
+    choices = Category.objects.form_choices(task.race)
     if request.method == 'POST':
-        form = RegistrationForm(request.POST)
+        form = RegistrationForm(choices, request.POST)
 
         if form.is_valid():
-            player_uuid = uuid.uuid4()
-            player_nickname = unidecode.unidecode(form.cleaned_data.get('nickname'))
-            player_category = form.cleaned_data.get('category')
+            player_name = form.cleaned_data.get('name')
+            category = Category.objects.get(pk=form.cleaned_data.get('category'))
 
-            response = render(request, 'registration_complete.html',
-                              _set_player_for_template((player_uuid, player_nickname, player_category), {}))
-            _set_cookie(response, 'player_uuid', player_uuid)
-            _set_cookie(response, 'player_nickname', player_nickname)
-            _set_cookie(response, 'player_category', player_category)
+            player = Player.objects.create(name=player_name, category=category, race=task.race)
+            Time.objects.create(player=player, task=task)
 
-            Time.objects.create(
-                player_uuid=player_uuid,
-                player_nickname=player_nickname,
-                player_category=player_category,
-                task=task
-            )
+            response = render(request, 'registration_complete.html', {
+                'player': player
+            })
+            _set_cookie(response, 'player_uuid', player.uuid)
 
             return response
 
     else:
-        form = RegistrationForm()
+        form = RegistrationForm(choices)
 
     return render(request, 'registration.html', {
         'form': form,

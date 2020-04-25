@@ -146,9 +146,9 @@
 <body>
 <header>
     KorOrienťák
-    {% if player_nickname %}
+    {% if player %}
     <div class="player">
-        {{ player_nickname }} <span class="player-category">{{ player_category }}</span>
+        {{ player.name }} <span class="player-category">{{ player.category.name }}</span>
     </div>
     {% endif %}
 </header>
