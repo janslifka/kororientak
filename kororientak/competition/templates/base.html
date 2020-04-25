@@ -5,32 +5,105 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>KorOrienťák</title>
     <link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css" rel="stylesheet">
     <style>
         body {
             font-family: 'Work Sans', sans-serif;
-            margin: 0;
+            margin: 50px 0 0;
+        }
+
+        body.with-player {
+            margin-top: 90px;
         }
 
         header {
             font-weight: 500;
             font-size: 1.2rem;
-            background: #3875d7;
             color: #fff;
+            position: fixed;
+            left: 0;
+            right: 0;
+            top: 0;
+            background: #3875d7;
             padding: 1rem;
+            z-index: 10;
         }
 
         header .player {
             font-size: 1rem;
             margin-top: 0.75rem;
             font-weight: normal;
+            max-width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
-        header .player .player-category {
+        header .player .player-info {
+            flex-grow: 1;
+            display: flex;
+            overflow: hidden;
+        }
+
+        header .player .player-info .player-name {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        header .player .player-info .player-category {
             background: rgba(0, 0, 0, 0.3);
             padding: 0.25rem 0.5rem;
             border-radius: 0.5rem;
             font-size: 0.8rem;
             margin-left: 0.5rem;
+            white-space: nowrap;
+        }
+
+        header .task-status {
+            margin: -0.5rem -0.5rem -0.5rem 2rem;
+            padding: 0.5rem;
+            white-space: nowrap;
+        }
+
+        .task-list {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            box-sizing: border-box;
+            color: #000;
+            font-weight: normal;
+            height: 0;
+            overflow: hidden;
+            background: #f0f0f0;
+            transition: height 0.2s ease-in-out;
+        }
+
+        .task-list.visible {
+            overflow: auto;
+            height: 100vh;
+        }
+
+        .task-list strong {
+            display: block;
+            margin-top: 7rem;
+            padding: 0 1rem;
+            font-size: 1.2rem;
+        }
+
+        .task-list ul {
+            padding: 0 1rem 1rem 2.5rem;
+        }
+
+        .task-list ul li {
+            margin-bottom: 0.5rem;
+        }
+
+        .task-list ul li.done {
+            color: #aaa;
+            text-decoration: line-through;
         }
 
         .content {
@@ -162,15 +235,56 @@
         }
     </style>
 </head>
-<body>
+<body {% if player %}class="with-player"{% endif %}>
 <header>
     KorOrienťák
     {% if player %}
     <div class="player">
-        {{ player.name }} <span class="player-category">{{ player.category.name }}</span>
+        <span class="player-info">
+            <span class="player-name">{{ player.name }}</span>
+            <span class="player-category">{{ player.category.name }}</span>
+        </span>
+        {% if not player.category.competitive %}
+        <span class="task-status">
+            {{ complete_tasks_complete_count }}/{{ complete_tasks_total_count }}
+            <i class="fas fa-chevron-down"></i>
+        </span>
+        {% endif %}
     </div>
     {% endif %}
 </header>
+{% if player and not player.category.competitive %}
+<div class="task-list">
+    <strong>Stanoviště</strong>
+    <ul>
+        {% for is_complete, task_name in complete_tasks %}
+        <li {% if is_complete %}class="done"{% endif %}>
+            {{ task_name}}
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+<script>
+    var visible = false
+    var taskStatus = document.querySelector('.task-status')
+    var taskStatusIcon = document.querySelector('.task-status .fas')
+    var taskList = document.querySelector('.task-list')
+
+    taskStatus.addEventListener('click', function () {
+        if (visible) {
+            taskList.classList.remove('visible')
+            taskStatusIcon.classList.remove('fa-chevron-up')
+            taskStatusIcon.classList.add('fa-chevron-down')
+            visible = false
+        } else {
+            taskList.classList.add('visible')
+            taskStatusIcon.classList.add('fa-chevron-up')
+            taskStatusIcon.classList.remove('fa-chevron-down')
+            visible = true
+        }
+    })
+</script>
+{% endif %}
 <div class="content">
     {% block content %}
     {% endblock %}

@@ -96,6 +96,13 @@ class TaskView(View):
     def _render(self, template, template_data):
         template_data['player'] = self.player
         template_data['task'] = self.task
+
+        if self.player and not self.player.category.competitive:
+            complete_tasks = self.player.complete_tasks_list()
+            template_data['complete_tasks'] = complete_tasks
+            template_data['complete_tasks_total_count'] = len(complete_tasks)
+            template_data['complete_tasks_complete_count'] = len([i for i in complete_tasks if i[0]])
+
         return render(self.request, template, template_data)
 
     def _set_cookie(self, response, key, value, days_expire=7):

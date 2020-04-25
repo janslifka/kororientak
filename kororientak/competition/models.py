@@ -30,6 +30,7 @@ class Category(models.Model):
     objects = CategoryManager()
 
     name = models.CharField('název', max_length=255)
+    competitive = models.BooleanField('závodní', default=False)
     race = models.ForeignKey(Race, verbose_name='závod', on_delete=models.CASCADE)
 
     class Meta:
@@ -54,6 +55,15 @@ class Player(models.Model):
 
     def __str__(self):
         return self.name
+
+    def complete_tasks_list(self):
+        tasks = Task.objects.filter(race=self.race, registration=False, finish=False)
+        times = [time.task for time in Time.objects.filter(player=self).only('task')]
+
+        def is_complete(task):
+            return task in times
+
+        return [(is_complete(task), task.name) for task in tasks]
 
 
 class Task(models.Model):
