@@ -114,3 +114,8 @@ class QRCodesView(LoginRequiredMixin, View):
         return render(request, 'qr-codes.html', {
             'tasks': tasks
         })
+
+
+class CookiesInfoView(View):
+    def get(self, request):
+        return render(request, 'cookies-info.html')

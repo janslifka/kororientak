@@ -6,6 +6,12 @@
 <form action="{% url 'task' task.uuid  %}" method="post">
     {% csrf_token %}
     {{ form }}
+
+    <p class="cookie-info">
+        KorOrienťák pro správné fungování používá soubory cookie. Registrací s tím souhlasíte.
+        <a href="{% url 'cookies_info' %}">Více informací</a>
+    </p>
+
     <input type="submit" value="Začít">
 </form>
 <script>
@@ -13,7 +19,7 @@
     var labels = document.querySelectorAll('#id_category label')
     Array.prototype.map.call(inputs, function ($el) {
         $el.addEventListener('change', function (ev) {
-            Array.prototype.map.call(labels, function($el1) {
+            Array.prototype.map.call(labels, function ($el1) {
                 $el1.classList.remove('selected')
             })
             $el.parentElement.classList.add('selected')
