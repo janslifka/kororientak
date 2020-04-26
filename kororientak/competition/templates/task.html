@@ -2,9 +2,15 @@
 
 {% block content %}
 {% if not player %}
-<p class="info">
-    Pokud se chceš zúčastnit celého běhu, více informací a mapu najdeš na <a href="{{info_url}}">{{info_url}}</a>
-</p>
+    {% if task.race.is_past %}
+    <p class="info">
+        Závod už skončil. Pořád ale můžeš plnit úkoly.
+    </p>
+    {% else %}
+    <p class="info">
+        Pokud se chceš zúčastnit celého běhu, více informací a mapu najdeš na <a href="{{info_url}}">{{info_url}}</a>
+    </p>
+    {% endif %}
 {% endif %}
 <h1>{{ task.name }}</h1>
 

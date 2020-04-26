@@ -4,6 +4,7 @@ import uuid as uuid
 from django.conf import settings
 from django.db import models
 from django.urls import reverse
+from django.utils import timezone
 
 
 class Race(models.Model):
@@ -19,6 +20,18 @@ class Race(models.Model):
 
     def __str__(self):
         return self.name
+
+    @property
+    def is_future(self):
+        return self.start > timezone.now()
+
+    @property
+    def is_past(self):
+        return self.end < timezone.now()
+
+    @property
+    def is_active(self):
+        return not self.is_future and not self.is_past
 
 
 class CategoryManager(models.Manager):

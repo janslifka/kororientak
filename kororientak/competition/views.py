@@ -16,6 +16,9 @@ class TaskView(View):
     def get(self, request, task_uuid):
         self._initialize(request, task_uuid)
 
+        if not self._can_be_served():
+            return HttpResponseNotFound()
+
         if self.task.registration:
             return self._handle_register()
 
@@ -40,9 +43,13 @@ class TaskView(View):
     def _get_player(self):
         try:
             player_uuid = self.request.COOKIES.get(self.PLAYER_UUID_COOKIE)
-            return Player.objects.get(uuid=player_uuid) if player_uuid else None
+            player = Player.objects.get(uuid=player_uuid) if player_uuid else None
+            return player if player.race == self.task.race else None
         except Exception:
             return None
+
+    def _can_be_served(self):
+        return self.task.race.is_active or (self.task.race.is_past and not (self.task.registration or self.task.finish))
 
     def _handle_register(self):
         choices = Category.objects.form_choices(self.task.race)
@@ -89,14 +96,16 @@ class TaskView(View):
 
     def _render(self, template, template_data):
         template_data['app_name'] = settings.APP_NAME
-        template_data['player'] = self.player
         template_data['task'] = self.task
 
-        if self.player and not self.player.category.competitive:
-            complete_tasks = self.player.complete_tasks_list()
-            template_data['complete_tasks'] = complete_tasks
-            template_data['complete_tasks_total_count'] = len(complete_tasks)
-            template_data['complete_tasks_complete_count'] = len([i for i in complete_tasks if i[0]])
+        if self.task.race.is_active:
+            template_data['player'] = self.player
+
+            if self.player and not self.player.category.competitive:
+                complete_tasks = self.player.complete_tasks_list()
+                template_data['complete_tasks'] = complete_tasks
+                template_data['complete_tasks_total_count'] = len(complete_tasks)
+                template_data['complete_tasks_complete_count'] = len([i for i in complete_tasks if i[0]])
 
         return render(self.request, template, template_data)
 
@@ -108,6 +117,8 @@ class TaskView(View):
 
 
 class QRCodesView(LoginRequiredMixin, View):
+    raise_exception = True
+
     def get(self, request, race_id):
         race = get_object_or_404(Race, pk=race_id)
         return render(request, 'qr-codes.html', {
