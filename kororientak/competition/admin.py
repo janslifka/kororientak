@@ -73,8 +73,20 @@ class TimeInline(ReadOnlyInlineMixin, admin.TabularInline):
 @admin.register(Race)
 class RaceAdmin(admin.ModelAdmin):
     list_display = ('name', 'start', 'end')
+    readonly_fields = ('qr_print_url',)
 
     inlines = (CategoryInline, TaskInline)
+
+    def get_fields(self, request, obj=None):
+        if obj:
+            return 'name', 'start', 'end', 'qr_code_text', 'qr_print_url'
+        else:
+            return 'name', 'start', 'end', 'qr_code_text'
+
+    @short_description('QR kódy')
+    def qr_print_url(self, obj):
+        url = reverse('qr_codes', args=[obj.pk])
+        return mark_safe(f'<a href="{url}" target="_blank">Tisk</a>')
 
 
 @admin.register(Player)
@@ -102,11 +114,11 @@ class TaskAdmin(admin.ModelAdmin):
 
     def qr_code(self, obj):
         src = f'https://api.qrserver.com/v1/create-qr-code/?size=500x500&data={self._url(obj)}'
-        return mark_safe(f'<img src={src}>')
+        return mark_safe(f'<img src="{src}">')
 
     def link(self, obj):
         href = self._url(obj)
-        return mark_safe(f'<a href={href}>{href}</a>')
+        return mark_safe(f'<a href="{href}">{href}</a>')
 
     def _url(self, obj):
         return settings.PUBLIC_URL + reverse('task', args=[obj.uuid])

@@ -3,11 +3,11 @@ import datetime
 from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseNotFound, HttpResponseNotAllowed
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.views import View
 
 from .forms import RegistrationForm
-from .models import Task, Time, Category, Player
+from .models import Task, Time, Category, Player, Race
 
 
 class TaskView(View):
@@ -15,9 +15,6 @@ class TaskView(View):
 
     def get(self, request, task_uuid):
         self._initialize(request, task_uuid)
-
-        if self.task is None:
-            return HttpResponseNotFound()
 
         if self.task.registration:
             return self._handle_register()
@@ -30,9 +27,6 @@ class TaskView(View):
     def post(self, request, task_uuid):
         self._initialize(request, task_uuid)
 
-        if self.task is None:
-            return HttpResponseNotFound()
-
         if self.task.registration:
             return self._handle_register()
 
@@ -40,7 +34,7 @@ class TaskView(View):
 
     def _initialize(self, request, task_uuid):
         self.request = request
-        self.task = Task.objects.get(uuid=task_uuid)
+        self.task = get_object_or_404(Task, uuid=task_uuid)
         self.player = self._get_player()
 
     def _get_player(self):
@@ -114,11 +108,11 @@ class TaskView(View):
 
 
 class QRCodesView(LoginRequiredMixin, View):
-    def get(self, request):
-        tasks = Task.objects.all()
-
+    def get(self, request, race_id):
+        race = get_object_or_404(Race, pk=race_id)
         return render(request, 'qr-codes.html', {
-            'tasks': tasks
+            'tasks': race.task_set.all(),
+            'text': race.qr_code_text
         })
 
 

@@ -1,0 +1,24 @@
+body {
+    font-family: "Work Sans", sans-serif;
+}
+
+.code {
+    width: 6cm;
+    float: left;
+    border: 1px dashed #ddd;
+    padding-top: 0.2cm;
+    page-break-inside: avoid;
+}
+
+.code img {
+    width: 5cm;
+    height: 5cm;
+    display: block;
+    margin: 0.2cm auto auto;
+}
+
+.info {
+    padding: 0 0.5cm;
+    font-size: 10pt;
+    text-align: justify;
+}
