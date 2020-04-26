@@ -22,24 +22,6 @@ def short_description(description):
     return decorator
 
 
-class ExportCsvMixin:
-    def export_as_csv(self, request, queryset):
-        meta = self.model._meta
-        field_names = [field.name for field in meta.fields]
-
-        response = HttpResponse(content_type='text/csv')
-        response['Content-Disposition'] = 'attachment; filename={}.csv'.format(meta)
-        writer = csv.writer(response)
-
-        writer.writerow(field_names)
-        for obj in queryset:
-            writer.writerow([getattr(obj, field) for field in field_names])
-
-        return response
-
-    export_as_csv.short_description = "Exportovat jako CSV"
-
-
 class ReadOnlyInlineMixin:
     def get_max_num(self, request, obj=None, **kwargs):
         return 0
@@ -73,20 +55,10 @@ class TimeInline(ReadOnlyInlineMixin, admin.TabularInline):
 @admin.register(Race)
 class RaceAdmin(admin.ModelAdmin):
     list_display = ('name', 'start', 'end')
-    readonly_fields = ('qr_print_url',)
 
     inlines = (CategoryInline, TaskInline)
 
-    def get_fields(self, request, obj=None):
-        if obj:
-            return 'name', 'start', 'end', 'qr_code_text', 'qr_print_url'
-        else:
-            return 'name', 'start', 'end', 'qr_code_text'
-
-    @short_description('QR kódy')
-    def qr_print_url(self, obj):
-        url = reverse('qr_codes', args=[obj.pk])
-        return mark_safe(f'<a href="{url}" target="_blank">Tisk</a>')
+    change_form_template = 'admin/race_change_form.html'
 
 
 @admin.register(Player)
@@ -125,14 +97,12 @@ class TaskAdmin(admin.ModelAdmin):
 
 
 @admin.register(Time)
-class TimeAdmin(ReadOnlyAdminMixin, ExportCsvMixin, admin.ModelAdmin):
+class TimeAdmin(ReadOnlyAdminMixin, admin.ModelAdmin):
     fields = ('created', 'player', 'task')
     readonly_fields = ('created', 'player', 'task')
 
     list_display = ('created', 'get_race', 'player', 'task')
     list_filter = ('task__race',)
-
-    actions = ('export_as_csv',)
 
     @short_description('závod')
     def get_race(self, obj):

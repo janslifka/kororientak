@@ -359,6 +359,10 @@ class RaceFlowTestCase(TestCase):
         response = self.client.get(f'/qr-kody/{self.race.pk}')
         self.assertEquals(response.status_code, 403)
 
+    def test_csv_export_not_public(self):
+        response = self.client.get(f'/export/{self.race.pk}')
+        self.assertEquals(response.status_code, 403)
+
     def _assert_correct_player_created(self, response, player_name, category):
         # player cookie is set
         self.assertIsNotNone(response.client.cookies.get('player_uuid'))

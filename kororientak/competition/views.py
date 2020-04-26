@@ -1,8 +1,9 @@
+import csv
 import datetime
 
 from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import HttpResponseNotFound, HttpResponseNotAllowed
+from django.http import HttpResponseNotFound, HttpResponseNotAllowed, HttpResponse
 from django.shortcuts import render, get_object_or_404
 from django.views import View
 
@@ -116,6 +117,11 @@ class TaskView(View):
         response.set_cookie(key, value, max_age=max_age, expires=expires)
 
 
+class CookiesInfoView(View):
+    def get(self, request):
+        return render(request, 'cookies-info.html')
+
+
 class QRCodesView(LoginRequiredMixin, View):
     raise_exception = True
 
@@ -127,6 +133,47 @@ class QRCodesView(LoginRequiredMixin, View):
         })
 
 
-class CookiesInfoView(View):
-    def get(self, request):
-        return render(request, 'cookies-info.html')
+class ExportCsvView(LoginRequiredMixin, View):
+    raise_exception = True
+
+    def get(self, request, race_id):
+        race = get_object_or_404(Race, pk=race_id)
+
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename=export.csv'
+        writer = csv.writer(response)
+
+        times = Time.objects.filter(task__race=race)
+
+        writer.writerow([
+            'created',
+            'player_uuid',
+            'player_name',
+            'player_category_id',
+            'player_category_name',
+            'player_category_competitive',
+            'task_uuid',
+            'task_name',
+            'task_registration',
+            'task_finish',
+            'task_text',
+            'task_youtube_link',
+        ])
+
+        for time in times:
+            writer.writerow([
+                time.created,
+                time.player.uuid,
+                time.player.name,
+                time.player.category.id,
+                time.player.category.name,
+                int(time.player.category.competitive),
+                time.task.uuid,
+                time.task.name,
+                int(time.task.registration),
+                int(time.task.finish),
+                time.task.text,
+                time.task.youtube_link,
+            ])
+
+        return response
