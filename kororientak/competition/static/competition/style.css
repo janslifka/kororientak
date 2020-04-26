@@ -70,6 +70,7 @@ header .task-status {
     overflow: hidden;
     background: #f0f0f0;
     transition: height 0.2s ease-in-out;
+    z-index: 5;
 }
 
 .task-list.visible {
@@ -85,16 +86,25 @@ header .task-status {
 }
 
 .task-list ul {
-    padding: 0 1rem 1rem 2.5rem;
+    padding: 0 1rem 1rem 1rem;
 }
 
 .task-list ul li {
-    margin-bottom: 0.5rem;
+    margin-bottom: 1rem;
+    list-style: none;
+    display: flex;
+}
+
+.task-list ul li .bullet {
+    width: 1.5rem;
+}
+
+.task-list ul li .task-name {
+    flex: 1;
 }
 
 .task-list ul li.done {
-    color: #aaa;
-    text-decoration: line-through;
+    color: #19865C;
 }
 
 .content {

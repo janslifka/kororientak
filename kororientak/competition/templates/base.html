@@ -38,7 +38,16 @@
     <ul>
         {% for is_complete, task_name in complete_tasks %}
         <li {% if is_complete %}class="done"{% endif %}>
-            {{ task_name}}
+            <div class="bullet">
+                {% if is_complete %}
+                    <i class="fas fa-check"></i>
+                {% else %}
+                    -
+                {% endif %}
+            </div>
+            <div class="task-name">
+                {{ task_name}}
+            </div>
         </li>
         {% endfor %}
     </ul>
