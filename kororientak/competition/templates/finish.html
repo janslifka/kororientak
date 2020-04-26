@@ -6,7 +6,7 @@
 <p>{{ task.text }}</p>
 {% else %}
 <p class="warning">
-    Nemáš vyzvednutou ani jednu kontrolu.
+    {{ task.finish_failed }}
 </p>
 {% endif %}
 {% endblock %}

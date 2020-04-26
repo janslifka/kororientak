@@ -86,7 +86,9 @@ class Task(models.Model):
     text = models.TextField('text', null=True, blank=True)
     youtube_link = models.CharField('YouTube video', max_length=255, null=True, blank=True)
     registration = models.BooleanField('registrace', default=False)
+    registration_successful = models.TextField('registrace úspěšná', null=True, blank=True)
     finish = models.BooleanField('cíl', default=False)
+    finish_failed = models.TextField('neúspěšný cíl', null=True, blank=True)
     race = models.ForeignKey(Race, verbose_name='závod', on_delete=models.PROTECT)
 
     class Meta:

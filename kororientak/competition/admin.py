@@ -80,9 +80,27 @@ class TaskAdmin(admin.ModelAdmin):
 
     def get_fields(self, request, obj=None):
         if obj:
-            return 'race', 'uuid', 'name', 'text', 'youtube_link', 'registration', 'finish', 'qr_code', 'link'
+            return ('race',
+                    'uuid',
+                    'name',
+                    'text',
+                    'youtube_link',
+                    'registration',
+                    'registration_successful',
+                    'finish',
+                    'finish_failed',
+                    'qr_code',
+                    'link',)
         else:
-            return 'race', 'uuid', 'name', 'text', 'youtube_link', 'registration', 'finish'
+            return ('race',
+                    'uuid',
+                    'name',
+                    'text',
+                    'youtube_link',
+                    'registration',
+                    'registration_successful',
+                    'finish',
+                    'finish_failed',)
 
     def qr_code(self, obj):
         src = f'https://api.qrserver.com/v1/create-qr-code/?size=500x500&data={self._url(obj)}'
