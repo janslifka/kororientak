@@ -8,7 +8,7 @@
     </p>
     {% else %}
     <p class="info">
-        Pokud se chceš zúčastnit celého běhu, více informací a mapu najdeš na <a href="{{info_url}}">{{info_url}}</a>
+        {{ task.race.not_registered_text |urlize }}
     </p>
     {% endif %}
 {% endif %}

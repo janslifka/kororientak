@@ -15,7 +15,12 @@ class RaceFlowTestCase(TestCase):
         before3days = today + datetime.timedelta(days=-3)
         before6days = today + datetime.timedelta(days=-6)
 
-        self.race = Race.objects.create(name='KorOrienťák', start=today, end=in3days)
+        self.race = Race.objects.create(
+            name='KorOrienťák',
+            start=today,
+            end=in3days,
+            not_registered_text='Pokud se chceš zúčastnit celého běhu'
+        )
         self.category_causual = Category.objects.create(name='Výletník', competitive=False, race=self.race)
         self.category_competitive = Category.objects.create(name='Borec', competitive=True, race=self.race)
 

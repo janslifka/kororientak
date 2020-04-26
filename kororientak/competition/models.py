@@ -12,6 +12,7 @@ class Race(models.Model):
     start = models.DateTimeField('začátek')
     end = models.DateTimeField('konec')
     qr_code_text = models.TextField('Text ke QR kódu', null=True, blank=True)
+    not_registered_text = models.TextField('Text pro neregistrované', null=True, blank=True)
 
     class Meta:
         verbose_name = 'Závod'
