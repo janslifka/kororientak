@@ -90,7 +90,7 @@ class TaskView(View):
         if self.player:
             self._create_time()
 
-        return self._render('task.html', {'info_url': settings.INFO_URL})
+        return self._render('task.html', {})
 
     def _create_time(self):
         Time.objects.get_or_create(player=self.player, task=self.task)
