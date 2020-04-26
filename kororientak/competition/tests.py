@@ -23,11 +23,13 @@ class RaceFlowTestCase(TestCase):
             name='Registrace',
             text='Napiš svoje jméno, vyber si kategorii a vyraž.',
             registration=True,
+            registration_successful='Výborně!',
             race=self.race)
         self.task_finish = Task.objects.create(
             name='Cíl',
             text='Gratulujeme, jsi v cíli!',
             finish=True,
+            finish_failed='Nemáš vyzvednutou ani jednu kontrolu.',
             race=self.race)
 
         # Text only
@@ -58,11 +60,13 @@ class RaceFlowTestCase(TestCase):
             name='Registrace',
             text='Napiš svoje jméno, vyber si kategorii a vyraž.',
             registration=True,
+            registration_successful='Výborně!',
             race=self.race_future)
         self.task_finish_future = Task.objects.create(
             name='Cíl',
             text='Gratulujeme, jsi v cíli!',
             finish=True,
+            finish_failed='Nemáš vyzvednutou ani jednu kontrolu.',
             race=self.race_future)
 
         self.race_past = Race.objects.create(name='Minulý KorOrienťák', start=before6days, end=before3days)
@@ -74,11 +78,13 @@ class RaceFlowTestCase(TestCase):
             name='Registrace',
             text='Napiš svoje jméno, vyber si kategorii a vyraž.',
             registration=True,
+            registration_successful='Výborně!',
             race=self.race_past)
         self.task_finish_past = Task.objects.create(
             name='Cíl',
             text='Gratulujeme, jsi v cíli!',
             finish=True,
+            finish_failed='Nemáš vyzvednutou ani jednu kontrolu.',
             race=self.race_past)
 
         self.race2 = Race.objects.create(name='Alternativní KorOrienťák', start=before3days, end=in6days)
@@ -90,11 +96,13 @@ class RaceFlowTestCase(TestCase):
             name='Alternativní Registrace',
             text='Prostě se zaregistruj',
             registration=True,
+            registration_successful='Výborně!',
             race=self.race2)
         self.task_finish_race2 = Task.objects.create(
             name='Konec',
             text='Hotovo',
             finish=True,
+            finish_failed='Nemáš vyzvednutou ani jednu kontrolu.',
             race=self.race2)
 
         self.client = Client()
@@ -121,6 +129,7 @@ class RaceFlowTestCase(TestCase):
             'category': self.category_causual.pk
         }, follow=True)
         self.assertEquals(response.status_code, 200)
+        self.assertContains(response, 'Výborně!')
         self._assert_correct_player_created(response, player_name, self.category_causual)
 
         # We should have task and player data with complete tasks in the context
@@ -145,6 +154,7 @@ class RaceFlowTestCase(TestCase):
             'category': self.category_competitive.pk
         }, follow=True)
         self.assertEquals(response.status_code, 200)
+        self.assertContains(response, 'Výborně!')
         self._assert_correct_player_created(response, player_name, self.category_competitive)
 
         # We should have task and player data but not complete tasks in the context
