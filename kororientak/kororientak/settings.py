@@ -145,3 +145,5 @@ STATIC_ROOT = os.path.join(PROJECT_ROOT, 'static')
 PUBLIC_URL = getenv('PUBLIC_URL', type=str, default='http://localhost:8000')
 
 INFO_URL = getenv('INFO_URL', type=str, default='http://sokol-liben.cz')
+
+APP_NAME = getenv('APP_NAME', type=str, default='KorOrienťák')

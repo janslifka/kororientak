@@ -10,8 +10,8 @@ from django.utils.safestring import mark_safe
 from .models import Task, Time, Race, Category, Player
 
 # Admin settings
-admin.site.site_header = 'KorOrienťák'
-admin.site.site_title = 'KorOrienťák'
+admin.site.site_header = settings.APP_NAME
+admin.site.site_title = settings.APP_NAME
 
 
 def short_description(description):

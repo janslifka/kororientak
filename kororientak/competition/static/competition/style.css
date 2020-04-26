@@ -197,6 +197,10 @@ form ul li label.selected {
     font-size: 0.85rem;
 }
 
+.cookie-info a {
+    white-space: nowrap;
+}
+
 .warning {
     color: #a41515;
 }

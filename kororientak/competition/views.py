@@ -94,6 +94,7 @@ class TaskView(View):
         Time.objects.get_or_create(player=self.player, task=self.task)
 
     def _render(self, template, template_data):
+        template_data['app_name'] = settings.APP_NAME
         template_data['player'] = self.player
         template_data['task'] = self.task
 
