@@ -1,0 +1,76 @@
+{% extends 'admin/base.html' %}
+
+{% block content %}
+<div>
+    <form action="." method="POST" enctype="multipart/form-data">
+        {{ form.as_p }}
+        {% csrf_token %}
+
+        <hr>
+        <strong style="display: inline-block; padding: 0.5rem 0">Příklad struktury CSV tabulky</strong>
+        <table>
+            <thead>
+                <tr>
+                    <th>uuid</th>
+                    <th>name</th>
+                    <th>text</th>
+                    <th>youtube_link</th>
+                    <th>registration</th>
+                    <th>registration_successful</th>
+                    <th>finish</th>
+                    <th>finish_failed</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>d50215bc-d74b-4fc6-a40d-b20155bb2861</td>
+                    <td>Úkol 1</td>
+                    <td>Zadání úkolu 1</td>
+                    <td>https://youtu.be/abcdefghijk</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>Registrace</td>
+                    <td>Zadej svoje jméno a vyraž.</td>
+                    <td></td>
+                    <td>1</td>
+                    <td>Výborně, můžeš vyrazit!</td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>Cíl</td>
+                    <td>Gratulujeme, jsi v cíli!</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td>1</td>
+                    <td>Nemáš splněnou ani jednu kontrolu.</td>
+                </tr>
+            </tbody>
+        </table>
+        <ul>
+            <li>První řádek tabulky se ignoruje</li>
+            <li><strong>uuid</strong> - uuid úkolu, pokud je prázdné, automaticky se vygeneruje</li>
+            <li><strong>name</strong> - název úkolu, musí být vždy vyplněný</li>
+            <li><strong>text</strong> - vysvětlení úkolů, není povinné</li>
+            <li><strong>youtube_link</strong> - odkaz na YouTube video zadání, není povinné</li>
+            <li><strong>registration</strong> - 1 pokud je úkol registrace, jinak prázdné</li>
+            <li><strong>registration_successful</strong> - text, co se zobrazí po úspěšné registraci, pouze pokud je registration 1</li>
+            <li><strong>finish</strong> - 1 pokud je úkol cíl, jinak prázdné</li>
+            <li><strong>finish_failed</strong> - text, co se zobrazí při neúspěšném cíli, pouze pokud je finish 1</li>
+        </ul>
+        <hr>
+
+
+        <div class="submit-row">
+            <input type="submit" value="Importovat CSV">
+        </div>
+    </form>
+</div>
+{% endblock %}

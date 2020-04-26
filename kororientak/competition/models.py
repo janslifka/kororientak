@@ -58,7 +58,7 @@ class Category(models.Model):
 
 
 class Player(models.Model):
-    uuid = models.UUIDField('uuid', default=uuid.uuid4)
+    uuid = models.UUIDField('uuid', default=uuid.uuid4, unique=True)
     name = models.CharField('jméno', max_length=255)
     race = models.ForeignKey(Race, verbose_name='závod', on_delete=models.PROTECT)
     category = models.ForeignKey(Category, verbose_name='kategorie', on_delete=models.PROTECT)
@@ -82,7 +82,7 @@ class Player(models.Model):
 
 
 class Task(models.Model):
-    uuid = models.UUIDField('uuid', default=uuid.uuid4)
+    uuid = models.UUIDField('uuid', default=uuid.uuid4, unique=True)
     name = models.CharField('název', max_length=255, default='')
     text = models.TextField('text', null=True, blank=True)
     youtube_link = models.CharField('YouTube video', max_length=255, null=True, blank=True)

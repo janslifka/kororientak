@@ -1,12 +1,14 @@
+import codecs
 import csv
-
-from django.contrib import admin
+import uuid
 
 from django.conf import settings
-from django.http import HttpResponse
-from django.urls import reverse
+from django.contrib import admin, messages
+from django.shortcuts import redirect, render
+from django.urls import reverse, path
 from django.utils.safestring import mark_safe
 
+from .forms import TaskImportForm
 from .models import Task, Time, Race, Category, Player
 
 # Admin settings
@@ -89,6 +91,8 @@ class TaskAdmin(admin.ModelAdmin):
     list_display = ('name', 'race_link', 'registration', 'finish')
     list_filter = ('race',)
 
+    change_list_template = 'admin/task_change_list.html'
+
     def get_fields(self, request, obj=None):
         if obj:
             return ('race',
@@ -127,6 +131,60 @@ class TaskAdmin(admin.ModelAdmin):
 
     def _url(self, obj):
         return settings.PUBLIC_URL + reverse('task', args=[obj.uuid])
+
+    def get_urls(self):
+        urls = super().get_urls()
+        model_urls = [path('import-csv/', self.import_csv)]
+        return model_urls + urls
+
+    def import_csv(self, request):
+        if request.method == 'POST':
+            try:
+                form = TaskImportForm(request.POST)
+                form.is_valid()
+                race = form.cleaned_data.get('race')
+
+                csv_file = request.FILES['csv_file']
+                reader = csv.reader(codecs.iterdecode(csv_file, 'utf-8'))
+
+                def clean_value(string):
+                    return string if len(string) > 0 else None
+
+                def bool_value(string):
+                    return True if string == '1' else False
+
+                first = True
+                for row in reader:
+                    if first:
+                        first = False
+                        continue
+
+                    if len(row) != 8:
+                        raise AssertionError
+
+                    task_uuid = clean_value(row[0])
+
+                    Task.objects.create(
+                        uuid=task_uuid if task_uuid else uuid.uuid4(),
+                        name=row[1],
+                        text=clean_value(row[2]),
+                        youtube_link=clean_value(row[3]),
+                        registration=bool_value(row[4]),
+                        registration_successful=clean_value(row[5]),
+                        finish=bool_value(row[6]),
+                        finish_failed=clean_value(row[7]),
+                        race=race
+                    )
+
+                self.message_user(request, 'Úkoly byly importovány.')
+            except Exception:
+                self.message_user(request, 'Úkoly se nepodařilo importovat.', level=messages.ERROR)
+            return redirect('..')
+
+        form = TaskImportForm()
+        return render(request, 'admin/task_import_form.html', {
+            'form': form
+        })
 
 
 @admin.register(Time)
