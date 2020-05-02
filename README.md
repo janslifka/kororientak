@@ -115,4 +115,4 @@ $ make codestyle
 
 ## Licence
 
-Tento je projekt je licencován pod licencí GNU AFFERO GENERAL PUBLIC LICENSE - další podrobnosti viz soubor [LICENSE](LICENSE).
+Tento projekt je licencován pod licencí GNU AFFERO GENERAL PUBLIC LICENSE - další podrobnosti viz soubor [LICENSE](LICENSE).
