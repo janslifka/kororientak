@@ -86,6 +86,8 @@ class Task(models.Model):
     name = models.CharField('název', max_length=255, default='')
     text = models.TextField('text', null=True, blank=True)
     youtube_link = models.CharField('YouTube video', max_length=255, null=True, blank=True)
+    assignment_link = models.CharField('odkaz na zadání', max_length=255, null=True, blank=True)
+    help_link = models.CharField('odkaz na nápovědu', max_length=255, null=True, blank=True)
     registration = models.BooleanField('registrace', default=False)
     registration_successful = models.TextField('registrace úspěšná', null=True, blank=True)
     finish = models.BooleanField('cíl', default=False)

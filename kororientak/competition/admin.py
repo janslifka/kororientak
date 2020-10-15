@@ -100,6 +100,8 @@ class TaskAdmin(admin.ModelAdmin):
                     'name',
                     'text',
                     'youtube_link',
+                    'assignment_link',
+                    'help_link',
                     'registration',
                     'registration_successful',
                     'finish',
@@ -112,6 +114,8 @@ class TaskAdmin(admin.ModelAdmin):
                     'name',
                     'text',
                     'youtube_link',
+                    'assignment_link',
+                    'help_link',
                     'registration',
                     'registration_successful',
                     'finish',
@@ -159,9 +163,8 @@ class TaskAdmin(admin.ModelAdmin):
                         first = False
                         continue
 
-                    if len(row) != 8:
+                    if len(row) != 10:
                         raise AssertionError
-
                     task_uuid = clean_value(row[0])
 
                     Task.objects.create(
@@ -169,10 +172,12 @@ class TaskAdmin(admin.ModelAdmin):
                         name=row[1],
                         text=clean_value(row[2]),
                         youtube_link=clean_value(row[3]),
-                        registration=bool_value(row[4]),
-                        registration_successful=clean_value(row[5]),
-                        finish=bool_value(row[6]),
-                        finish_failed=clean_value(row[7]),
+                        assignment_link=clean_value(row[4]),
+                        help_link=clean_value(row[5]),
+                        registration=bool_value(row[6]),
+                        registration_successful=clean_value(row[7]),
+                        finish=bool_value(row[8]),
+                        finish_failed=clean_value(row[9]),
                         race=race
                     )
 

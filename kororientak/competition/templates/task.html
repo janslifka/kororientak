@@ -24,4 +24,27 @@
 </div>
 {% endif %}
 
+{% if task.assignment_link %}
+<div>
+    <a class="btn btn-primary" href="{{ task.assignment_link }}" target="_blank">
+        Otevřít zadání
+    </a>
+</div>
+{% endif %}
+
+{% if task.help_link %}
+<div class="help">
+    <a id="help-link" class="btn btn-secondary" href="{{ task.help_link }}" target="_blank">
+        Otevřít nápovědu
+    </a>
+</div>
+<script>
+(function () {
+    document.getElementById('help-link').onclick = function() {
+        return confirm('Opravdu to nevymslíš sám a chceš zobrazit nápovědu?')
+    }
+})()
+</script>
+{% endif %}
+
 {% endblock %}
